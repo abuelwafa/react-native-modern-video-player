@@ -1968,6 +1968,21 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
   integrity sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==
 
+"@types/react-native-video@^5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@types/react-native-video/-/react-native-video-5.0.3.tgz#21aef3c087d498d75cb4631e8197d2b4b913170c"
+  integrity sha512-5GbhErfUvilPsZNaSCj6+fOM1UyBMN4QYi8Yb0E4tGzXdnGN4B9ILGe7tivys+EXUmgiWWcXlxQdpaDcKZzlqg==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
+"@types/react-native@*":
+  version "0.63.33"
+  resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.63.33.tgz#cd7123a872fcda8f2563c324ff7d35fc91d86d81"
+  integrity sha512-bqRtJI4EwiV3OTc9pHjmtE/ZIOLYi9KbrnMWyJIb90Z7+eXKPimKPTBU1oDVNdw8CXkDCrZaengvvdu2JMvjtg==
+  dependencies:
+    "@types/react" "*"
+
 "@types/react-native@0.62.13":
   version "0.62.13"
   resolved "https://registry.yarnpkg.com/@types/react-native/-/react-native-0.62.13.tgz#c688c5ae03e426f927f7e1fa1a59cd067f35d1c2"
@@ -2619,6 +2634,11 @@ bindings@^1.5.0:
   integrity sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==
   dependencies:
     file-uri-to-path "1.0.0"
+
+boolbase@^1.0.0, boolbase@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/boolbase/-/boolbase-1.0.0.tgz#68dff5fbe60c51eb37725ea9e3ed310dcc1e776e"
+  integrity sha1-aN/1++YMUes3cl6p4+0xDcwed24=
 
 boxen@^4.2.0:
   version "4.2.0"
@@ -3452,6 +3472,29 @@ crypto-random-string@^2.0.0:
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-2.0.0.tgz#ef2a7a966ec11083388369baa02ebead229b30d5"
   integrity sha512-v1plID3y9r/lPhviJ1wrXpLeyUIGAZ2SHNYTEapm7/8A9nLPoyvVp3RK/EPFqn5kEznyWgYZNsRtYYIWbuG8KA==
 
+css-select@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/css-select/-/css-select-2.1.0.tgz#6a34653356635934a81baca68d0255432105dbef"
+  integrity sha512-Dqk7LQKpwLoH3VovzZnkzegqNSuAziQyNZUcrdDM401iY+R5NkGBXGmtO05/yaXQziALuPogeG0b7UAgjnTJTQ==
+  dependencies:
+    boolbase "^1.0.0"
+    css-what "^3.2.1"
+    domutils "^1.7.0"
+    nth-check "^1.0.2"
+
+css-tree@^1.0.0-alpha.39:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/css-tree/-/css-tree-1.0.0.tgz#21993fa270d742642a90409a2c0cb3ac0298adf6"
+  integrity sha512-CdVYz/Yuqw0VdKhXPBIgi8DO3NicJVYZNWeX9XcIuSp9ZoFT5IcleVRW07O5rMjdcx1mb+MEJPknTTEW7DdsYw==
+  dependencies:
+    mdn-data "2.0.12"
+    source-map "^0.6.1"
+
+css-what@^3.2.1:
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/css-what/-/css-what-3.4.2.tgz#ea7026fcb01777edbde52124e21f327e7ae950e4"
+  integrity sha512-ACUm3L0/jiZTqfzRM3Hi9Q8eZqd6IK37mMWPLz9PJxkLWllYeRf+EHUSHYEtFop2Eqytaq1FizFVh7XfBnXCDQ==
+
 cssom@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/cssom/-/cssom-0.4.4.tgz#5a66cf93d2d0b661d80bf6a44fb65f5c2e4e0a10"
@@ -3741,12 +3784,38 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
+dom-serializer@0:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/dom-serializer/-/dom-serializer-0.2.2.tgz#1afb81f533717175d478655debc5e332d9f9bb51"
+  integrity sha512-2/xPb3ORsQ42nHYiSunXkDjPLBaEj/xTwUO4B7XCZQTRk7EBtTOPaygh10YAAh2OI1Qrp6NWfpAhzswj0ydt9g==
+  dependencies:
+    domelementtype "^2.0.1"
+    entities "^2.0.0"
+
+domelementtype@1:
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-1.3.1.tgz#d048c44b37b0d10a7f2a3d5fee3f4333d790481f"
+  integrity sha512-BSKB+TSpMpFI/HOxCNr1O8aMOTZ8hT3pM3GQ0w/mWRmkhEDSFJkkyzz4XQsBV44BChwGkrDfMyjVD0eA2aFV3w==
+
+domelementtype@^2.0.1:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/domelementtype/-/domelementtype-2.0.2.tgz#f3b6e549201e46f588b59463dd77187131fe6971"
+  integrity sha512-wFwTwCVebUrMgGeAwRL/NhZtHAUyT9n9yg4IMDwf10+6iCMxSkVq9MGCVEH+QZWo1nNidy8kNvwmv4zWHDTqvA==
+
 domexception@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/domexception/-/domexception-2.0.1.tgz#fb44aefba793e1574b0af6aed2801d057529f304"
   integrity sha512-yxJ2mFy/sibVQlu5qHjOkf9J3K6zgmCxgJ94u2EdvDOV09H+32LtRswEcUsmUWN72pVLOEnTSRaIVVzVQgS0dg==
   dependencies:
     webidl-conversions "^5.0.0"
+
+domutils@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/domutils/-/domutils-1.7.0.tgz#56ea341e834e06e6748af7a1cb25da67ea9f8c2a"
+  integrity sha512-Lgd2XcJ/NjEw+7tFvfKxOzCYKZsdct5lczQ2ZaQY8Djz7pfAD3Gbp8ySJWtreII/vDlMVmxwa6pHmdxIYgttDg==
+  dependencies:
+    dom-serializer "0"
+    domelementtype "1"
 
 dot-prop@^3.0.0:
   version "3.0.0"
@@ -3792,6 +3861,11 @@ electron-to-chromium@^1.3.571:
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.576.tgz#2e70234484e03d7c7e90310d7d79fd3775379c34"
   integrity sha512-uSEI0XZ//5ic+0NdOqlxp0liCD44ck20OAGyLMSymIWTEAtHKVJi6JM18acOnRgUgX7Q65QqnI+sNncNvIy8ew==
 
+eme-encryption-scheme-polyfill@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.0.1.tgz#b080b01bffd74c75c9cf8044c1cabedf3b83954f"
+  integrity sha512-Wz+Ro1c0/2Wsx2RLFvTOO0m4LvYn+7cSnq3XOvRvLLBq8jbvUACH/zpU9s0/5+mQa5oaelkU69x+q0z/iWYrFA==
+
 emittery@^0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/emittery/-/emittery-0.7.1.tgz#c02375a927a40948c0345cc903072597f5270451"
@@ -3832,6 +3906,11 @@ enquirer@^2.3.5:
   integrity sha512-yjNnPr315/FjS4zIsUxYguYUPP2e1NK4d7E7ZOLiyYCcbFBiTMyID+2wvm2w6+pZ/odMA7cRkjhsPbltwBOrLg==
   dependencies:
     ansi-colors "^4.1.1"
+
+entities@^2.0.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/entities/-/entities-2.1.0.tgz#992d3129cf7df6870b96c57858c249a120f8b8b5"
+  integrity sha512-hCx1oky9PFrJ611mf0ifBLBRW8lUUVRlFolb5gWRfIELabBlbp9xZvrqZLZAs+NxFnbfQoeGd8wDkygjg7U85w==
 
 envinfo@^7.7.2:
   version "7.7.3"
@@ -6292,6 +6371,11 @@ jsx-ast-utils@^2.4.1:
     array-includes "^3.1.1"
     object.assign "^4.1.0"
 
+keymirror@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/keymirror/-/keymirror-0.1.1.tgz#918889ea13f8d0a42e7c557250eee713adc95c35"
+  integrity sha1-kYiJ6hP40KQufFVyUO7nE63JXDU=
+
 keyv@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/keyv/-/keyv-3.1.0.tgz#ecc228486f69991e49e9476485a5be1e8fc5c4d9"
@@ -6597,6 +6681,11 @@ map-visit@^1.0.0:
   integrity sha1-7Nyo8TFE5mDxtb1B8S80edmN+48=
   dependencies:
     object-visit "^1.0.0"
+
+mdn-data@2.0.12:
+  version "2.0.12"
+  resolved "https://registry.yarnpkg.com/mdn-data/-/mdn-data-2.0.12.tgz#bbb658d08b38f574bbb88f7b83703defdcc46844"
+  integrity sha512-ULbAlgzVb8IqZ0Hsxm6hHSlQl3Jckst2YEQS7fODu9ilNWy2LvcoSY7TRFIktABP2mdppBioc66va90T+NUs8Q==
 
 meow@5.0.0:
   version "5.0.0"
@@ -7196,6 +7285,13 @@ npm-run-path@^4.0.0:
   integrity sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==
   dependencies:
     path-key "^3.0.0"
+
+nth-check@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/nth-check/-/nth-check-1.0.2.tgz#b2bd295c37e3dd58a3bf0700376663ba4d9cf05c"
+  integrity sha512-WeBOdju8SnzPN5vTUJYxYUxLeXpCaVP5i5e0LF8fg7WORF2Wd7wFX/pk0tYZk7s8T+J7VLy0Da6J1+wCT0AtHg==
+  dependencies:
+    boolbase "~1.0.0"
 
 nullthrows@^1.1.1:
   version "1.1.1"
@@ -7922,6 +8018,28 @@ react-is@^16.12.0, react-is@^16.8.1, react-is@^16.8.4:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-orientation-locker@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-orientation-locker/-/react-native-orientation-locker-1.2.0.tgz#9fa51b3aade9b847e63066b6fd60509371940a7e"
+  integrity sha512-lnwp9Jbt1m/0Gfw9a5Mrwj/APNSuYkVdJEgBKRyQgOshDrKRv5dxpD0P786AgIEjnEbjyrNOS6GQvBdqPYSxsg==
+
+react-native-svg@^12.1.0:
+  version "12.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-12.1.0.tgz#acfe48c35cd5fca3d5fd767abae0560c36cfc03d"
+  integrity sha512-1g9qBRci7man8QsHoXn6tP3DhCDiypGgc6+AOWq+Sy+PmP6yiyf8VmvKuoqrPam/tf5x+ZaBT2KI0gl7bptZ7w==
+  dependencies:
+    css-select "^2.1.0"
+    css-tree "^1.0.0-alpha.39"
+
+react-native-video@^5.1.0-alpha8:
+  version "5.1.0-alpha8"
+  resolved "https://registry.yarnpkg.com/react-native-video/-/react-native-video-5.1.0-alpha8.tgz#f0cb4cb2d74154b7916e68bef0f9b9cdcfe5f568"
+  integrity sha512-RRDSxqKe2F4OtiDWKCQlwVzvcsZ/TcWQdRxeAE3wsGBmFpAYFyhCz52QkFXgQQgYUuIK6Wd+j2lVxUoLp4+R2w==
+  dependencies:
+    keymirror "^0.1.1"
+    prop-types "^15.7.2"
+    shaka-player "^2.5.9"
+
 react-native@0.62.2:
   version "0.62.2"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.62.2.tgz#d831e11a3178705449142df19a70ac2ca16bad10"
@@ -8600,6 +8718,13 @@ setprototypeof@1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.1.1.tgz#7e95acb24aa92f5885e0abef5ba131330d4ae683"
   integrity sha512-JvdAWfbXeIGaZ9cILp38HntZSFSo3mWg6xGcJJsd+d4aRMOqauag1C63dJfDw7OaMYwEbHMOxEZ1lqVRYP2OAw==
+
+shaka-player@^2.5.9:
+  version "2.5.17"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-2.5.17.tgz#824740a0db06fd433397389650ec94ce3b57a26d"
+  integrity sha512-v8kzAXJOiEnI9B1z0CmlMSIbsIfmPseHuosriKqqnDWvDlYVwvdwUz4biPvxUiRIIw9v6His548kPQdO39+jow==
+  dependencies:
+    eme-encryption-scheme-polyfill "^2.0.1"
 
 shebang-command@^1.2.0:
   version "1.2.0"

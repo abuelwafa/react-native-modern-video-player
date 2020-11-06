@@ -49,6 +49,7 @@
     "@types/jest": "^26.0.0",
     "@types/react": "^16.9.19",
     "@types/react-native": "0.62.13",
+    "@types/react-native-video": "^5.0.3",
     "commitlint": "^8.3.5",
     "eslint": "^7.2.0",
     "eslint-config-prettier": "^6.11.0",
@@ -64,7 +65,10 @@
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-orientation-locker": "*",
+    "react-native-svg": "*",
+    "react-native-video": "*"
   },
   "jest": {
     "preset": "react-native",
@@ -110,26 +114,39 @@
       "prettier/prettier": [
         "error",
         {
-          "quoteProps": "consistent",
+          "semi": true,
+          "tabWidth": 4,
+          "printWidth": 100,
+          "bracketSpacing": true,
+          "jsxBracketSameLine": true,
           "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
+          "trailingComma": "all",
           "useTabs": false
         }
       ]
     }
   },
-  "eslintIgnore": ["node_modules/", "lib/"],
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
   "prettier": {
-    "quoteProps": "consistent",
     "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
+    "tabWidth": 4,
+    "useTabs": false,
+    "semi": true,
+    "printWidth": 100,
+    "bracketSpacing": true,
+    "jsxBracketSameLine": true,
+    "trailingComma": "all"
   },
   "@react-native-community/bob": {
     "source": "src",
     "output": "lib",
-    "targets": ["commonjs", "module", "typescript"]
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
   }
 }
