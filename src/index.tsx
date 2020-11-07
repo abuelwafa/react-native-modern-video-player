@@ -81,18 +81,6 @@ interface VideoPlayerProps extends Omit<VideoProperties, 'source'> {
     iOSNativeControls?: boolean;
 }
 
-// finish uncontrolled component
-// seek
-// playback rate
-// thumbnail
-// duration display --- done
-// volume control
-// callbacks
-// loading/buffering state and ui
-// handle back button on android full screen
-// subtitles support
-// theming - customizing styling
-
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
     src,
     showSkipButtons = true,
@@ -104,6 +92,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     poster,
     onProgress,
     onLoad,
+    onEnd,
     ...rest
 }) => {
     const inlineVideoRef = useRef<Video>(null);
@@ -152,6 +141,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     {inlineVideoStarted ? (
                         <TouchableWithoutFeedback
                             onPress={() => videoLoaded && setShowControls(true)}>
+                            {/* inline video*/}
                             <Video
                                 repeat={repeat}
                                 paused={!isPlaying}
@@ -161,7 +151,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 style={StyleSheet.absoluteFillObject}
                                 {...rest}
                                 source={{ uri: src }}
-                                volume={muted ? 0 : 1}
+                                volume={1}
+                                muted={muted}
                                 resizeMode="contain"
                                 ref={inlineVideoRef}
                                 onProgress={(...params) => {
@@ -181,6 +172,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     onLoad && onLoad(...params);
                                 }}
                                 controls={iOSNativeControls && Platform.OS === 'ios'}
+                                onEnd={(...params) => {
+                                    setCurrentlyPlaying(null);
+                                    setShowControls(true);
+                                    onEnd && onEnd(...params);
+                                }}
                             />
                         </TouchableWithoutFeedback>
                     ) : (
@@ -423,6 +419,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     <StatusBar hidden={fullscreen} />
                     <TouchableWithoutFeedback
                         onPress={() => fullScreenVideoLoaded && setShowFullscreenControls(true)}>
+                        {/* fullscreen video - android only */}
                         <Video
                             repeat={repeat}
                             paused={!isPlaying}
@@ -432,7 +429,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             style={[StyleSheet.absoluteFillObject, { backgroundColor: 'black' }]}
                             {...rest}
                             source={{ uri: src }}
-                            volume={muted ? 0 : 1}
+                            volume={1}
+                            muted={muted}
                             resizeMode="cover"
                             ref={fullscreenVideoRef}
                             onLoad={(...params) => {
@@ -451,6 +449,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 onProgress && onProgress(...params);
                             }}
                             controls={false}
+                            onEnd={(...params) => {
+                                setCurrentlyPlaying(null);
+                                setShowControls(true);
+                                setFullscreenVideoPosition(0);
+                                setInlineVideoPosition(0);
+                                exitFullScreen();
+                                onEnd && onEnd(...params);
+                            }}
                         />
                     </TouchableWithoutFeedback>
                     {fullscreenIsLoading && !fullScreenVideoLoaded && (
@@ -572,7 +578,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                         justifyContent: 'space-between',
                                     }}>
                                     <Text style={{ color: '#fff', marginLeft: 8, fontSize: 12 }}>
-                                        {formatSecondsTime(inlineVideoPosition)} /{' '}
+                                        {formatSecondsTime(fullscreenVideoPosition)} /{' '}
                                         {formatSecondsTime(duration)}
                                     </Text>
 
