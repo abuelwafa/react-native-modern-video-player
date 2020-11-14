@@ -1,14 +1,14 @@
 # react-native-modern-video-player
 
-simple video player for react native based on react-native-video
+Currently a Simple video player for react native based on react-native-video. Aiming to become a full featured video player with a clean and customizable UI, on top of a simple and extensible API.
 
 ## Installation
 
 Install the required peer dependencies. follow their install instructions
 
--   [react-native-video](https://github.com/react-native-video/react-native-video)
--   [react-native-svg](https://github.com/react-native-svg/react-native-svg)
--   [react-native-orientation-locker](https://www.npmjs.com/package/react-native-orientation-locker)
+- [react-native-video](https://github.com/react-native-video/react-native-video)
+- [react-native-svg](https://github.com/react-native-svg/react-native-svg)
+- [react-native-orientation-locker](https://www.npmjs.com/package/react-native-orientation-locker)
 
 ```sh
 npm install react-native-modern-video-player
@@ -34,12 +34,29 @@ const App = () => {
 
 You can wrap one or more `VideoPlayer` components inside a `VideoPlayerProvider` to control the state of which video is currently playing. it makes sure only one video is playing in a list of videos (inside a timeline feed for example).
 
-## TODO:
+## API
 
--   Complete documentation.
--   Write tests.
--   Autohide controls after a confgurable time period.
--   Subtitles support.
+### `VideoPlayer` props
+
+The `VideoPlayer` components accepts all of the props passed to the [Video](https://github.com/react-native-video/react-native-video#configurable-props) component from react-native-video, in addition to the following props:
+
+| prop | type | default value | description |
+| ---- | ---- | ------------- | ----------- |
+|src|String Required|default value|video url as a string. this is a shortcut convinent prop for simple cases of having one video url. you can still use the `source` prop from react-native-video as documented their. but either one of `src` or `source` prop from react-native-video must be used. `source` will override `src` if both are provided. if none of them are provided or `src` is provided with a value other than a primitive string, the VideoPlayer component will render nothing and throws an error in development |
+|onNextVideo|Function Optional|undefined|call back function which is triggered on pressing the next button|
+|onPreviousVideo|Function Optional|undefined|call back function which is triggered on pressing the previous button|
+|iOSNativeControls|boolean|true|whether to use iOS native controls or VideoPlayer custom controls|
+
+## TODO
+
+- Seek functionality
+- Complete documentation.
+- Write tests.
+- Autohide controls after a confgurable time period.
+- Subtitles support.
+- Playback rate.
+- Callback hooks
+- Theming - customizing styling
 
 ## Contributing
 
@@ -48,3 +65,4 @@ See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the 
 ## License
 
 MIT
+
