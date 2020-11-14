@@ -60,6 +60,9 @@
     "prettier": "^2.0.5",
     "react": "16.11.0",
     "react-native": "0.62.2",
+    "react-native-orientation-locker": "^1.2.0",
+    "react-native-svg": "^12.1.0",
+    "react-native-video": "^5.1.0-alpha8",
     "release-it": "^13.5.8",
     "typescript": "^3.8.3"
   },
