@@ -64,6 +64,7 @@ const VideoPlayerContext = React.createContext<{
 
 const VideoPlayerProvider: React.FC = ({ children }) => {
     const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+
     return (
         <VideoPlayerContext.Provider value={{ currentlyPlaying, setCurrentlyPlaying }}>
             {children}
@@ -71,8 +72,7 @@ const VideoPlayerProvider: React.FC = ({ children }) => {
     );
 };
 
-interface VideoPlayerProps extends Omit<VideoProperties, 'source'> {
-    src: string;
+interface BaseVideoPlayerProps {
     skipInterval?: number;
     showSkipButtons?: boolean;
     showPlaylistControls?: boolean;
@@ -81,8 +81,20 @@ interface VideoPlayerProps extends Omit<VideoProperties, 'source'> {
     iOSNativeControls?: boolean;
 }
 
+interface VideoPlayerPropsWithSrc extends Omit<VideoProperties, 'source'>, BaseVideoPlayerProps {
+    src: string;
+    source?: undefined;
+}
+
+interface VideoPlayerPropsWithoutSrc extends VideoProperties, BaseVideoPlayerProps {
+    src?: never;
+}
+
+type VideoPlayerProps = VideoPlayerPropsWithSrc | VideoPlayerPropsWithoutSrc;
+
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
-    src,
+    src = undefined,
+    source = null,
     showSkipButtons = true,
     skipInterval = 10,
     repeat = false,
@@ -120,7 +132,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const returnFromFullscreen = useRef(false);
 
     const { currentlyPlaying, setCurrentlyPlaying } = useContext(VideoPlayerContext);
-    const isPlaying = currentlyPlaying === src;
+
+    if (!src && !source) {
+        if (__DEV__) {
+            console.error(
+                'Either one of src or source props must be passed to VideoPlayer component',
+            );
+        }
+        return null;
+    }
+
+    if (src && typeof src !== 'string') {
+        if (__DEV__) {
+            console.error('src attribute on the VideoPlayer component must be a string');
+        }
+        return null;
+    }
+
+    let isPlaying: boolean = false;
+    if (source) {
+        isPlaying = currentlyPlaying === JSON.stringify(source);
+    }
+    if (src) {
+        isPlaying = currentlyPlaying === src;
+    }
 
     const isLoading = isPlaying && playableDuration - inlineVideoPosition <= 0;
     const fullscreenIsLoading =
@@ -133,6 +168,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         setShowFullscreenControls(false);
         Orientation.lockToPortrait();
     };
+
+    const videoSource: VideoProperties['source'] = source || { uri: src };
 
     return (
         <View style={{ flex: 1, width: '100%', position: 'relative' }} key={src}>
@@ -150,7 +187,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 posterResizeMode="cover"
                                 style={StyleSheet.absoluteFillObject}
                                 {...rest}
-                                source={{ uri: src }}
+                                source={videoSource}
                                 volume={1}
                                 muted={muted}
                                 resizeMode="contain"
@@ -190,7 +227,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 onPress={() => {
                                     // extract this to a function called play
                                     setInlineVideoStarted(true);
-                                    setCurrentlyPlaying(src);
+                                    setCurrentlyPlaying(
+                                        source ? JSON.stringify(source) : src ? src : null,
+                                    );
                                 }}
                                 style={{
                                     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -269,7 +308,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 setCurrentlyPlaying(null);
                                             } else {
                                                 setInlineVideoStarted(true);
-                                                setCurrentlyPlaying(src);
+                                                setCurrentlyPlaying(
+                                                    source
+                                                        ? JSON.stringify(source)
+                                                        : src
+                                                        ? src
+                                                        : null,
+                                                );
                                             }
                                         }}
                                         style={{ padding: 8 }}>
@@ -428,7 +473,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             posterResizeMode="cover"
                             style={[StyleSheet.absoluteFillObject, { backgroundColor: 'black' }]}
                             {...rest}
-                            source={{ uri: src }}
+                            source={videoSource}
                             volume={1}
                             muted={muted}
                             resizeMode="cover"
@@ -525,7 +570,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 setCurrentlyPlaying(null);
                                             } else {
                                                 setInlineVideoStarted(true);
-                                                setCurrentlyPlaying(src);
+                                                setCurrentlyPlaying(
+                                                    source
+                                                        ? JSON.stringify(source)
+                                                        : src
+                                                        ? src
+                                                        : null,
+                                                );
                                             }
                                         }}
                                         style={{ padding: 8 }}>
