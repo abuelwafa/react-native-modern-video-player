@@ -212,6 +212,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 onEnd={(...params) => {
                                     setCurrentlyPlaying(null);
                                     setShowControls(true);
+                                    fullscreenVideoRef.current?.seek(0);
+                                    inlineVideoRef.current?.seek(0);
                                     onEnd && onEnd(...params);
                                 }}
                             />
@@ -253,7 +255,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         </View>
                     )}
 
-                    {videoLoaded && showControls && (
+                    {((Platform.OS === 'android' && videoLoaded && showControls) ||
+                        (Platform.OS === 'ios' &&
+                            !iOSNativeControls &&
+                            videoLoaded &&
+                            showControls)) && (
                         <TouchableWithoutFeedback onPress={() => setShowControls(false)}>
                             {/* controls container*/}
                             <View
@@ -499,6 +505,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 setShowControls(true);
                                 setFullscreenVideoPosition(0);
                                 setInlineVideoPosition(0);
+                                fullscreenVideoRef.current?.seek(0);
+                                inlineVideoRef.current?.seek(0);
                                 exitFullScreen();
                                 onEnd && onEnd(...params);
                             }}
