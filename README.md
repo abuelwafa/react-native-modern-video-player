@@ -16,6 +16,8 @@ npm install react-native-modern-video-player
 
 ## Usage
 
+The main 2 exports are the `VideoPlayer` component which is an uncontrolled component which wraps the `Video` component from react-native-video. the other is the `VideoPlayerProvider`.
+
 ```js
 import { VideoPlayer, VideoPlayerProvider } from 'react-native-modern-video-player';
 
@@ -32,7 +34,9 @@ const App = () => {
 };
 ```
 
-You can wrap one or more `VideoPlayer` components inside a `VideoPlayerProvider` to control the state of which video is currently playing. it makes sure only one video is playing in a list of videos (inside a timeline feed for example).
+The `src` prop is a convinent shorthand which accepts the video URL as string. which should be sufficient in most cases. You can still pass the `source` prop for the video component from `react-native-video` directly to have more control. If both props were passed, the `source` prop will override `src`.
+
+You can wrap one or more `VideoPlayer` components inside a `VideoPlayerProvider` to control the state of which video is currently playing. it makes sure only one video is playing in a list of videos (inside a timeline feed for example). take a look at the example app to see how this works.
 
 ## API
 
@@ -46,13 +50,15 @@ The `VideoPlayer` components accepts all of the props passed to the [Video](http
 |onNextVideo|Function Optional|undefined|call back function which is triggered on pressing the next button|
 |onPreviousVideo|Function Optional|undefined|call back function which is triggered on pressing the previous button|
 |iOSNativeControls|boolean|true|whether to use iOS native controls or VideoPlayer custom controls|
+|showSkipButtons|boolean optional|true|whether to display the skip buttons or not|
+|skipInterval|number optional|10|number of seconds to seek forward or backwards upon pressing the skip buttons|
 
 ## TODO
 
 - Seek functionality
+- Autohide controls after a confgurable time period.
 - Complete documentation.
 - Write tests.
-- Autohide controls after a confgurable time period.
 - Subtitles support.
 - Playback rate.
 - Callback hooks
