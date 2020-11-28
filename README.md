@@ -52,11 +52,11 @@ The `VideoPlayer` components accepts all of the props passed to the [Video](http
 |iOSNativeControls|boolean|true|whether to use iOS native controls or VideoPlayer custom controls|
 |showSkipButtons|boolean optional|true|whether to display the skip buttons or not|
 |skipInterval|number optional|10|number of seconds to seek forward or backwards upon pressing the skip buttons|
+|hideControlsTimeout|number optional|4000|time in ms before hiding the controls. Controls will not hide if the video is paused.|
 
 ## TODO
 
 - Seek functionality
-- Autohide controls after a confgurable time period.
 - Complete documentation.
 - Write tests.
 - Subtitles support.

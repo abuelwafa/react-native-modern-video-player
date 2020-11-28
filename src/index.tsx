@@ -79,6 +79,7 @@ interface BaseVideoPlayerProps {
     onNextVideo?: () => void;
     onPreviousVideo?: () => void;
     iOSNativeControls?: boolean;
+    hideControlsTimeout?: number;
 }
 
 interface VideoPlayerPropsWithSrc extends Omit<VideoProperties, 'source'>, BaseVideoPlayerProps {
@@ -105,10 +106,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     onProgress,
     onLoad,
     onEnd,
+    hideControlsTimeout = 4000,
     ...rest
 }) => {
     const inlineVideoRef = useRef<Video>(null);
     const fullscreenVideoRef = useRef<Video>(null);
+    const { currentlyPlaying, setCurrentlyPlaying } = useContext(VideoPlayerContext);
 
     const [fullscreen, setFullscreen] = useState(false);
 
@@ -130,8 +133,57 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
     const [inlineVideoStarted, setInlineVideoStarted] = useState(false);
     const returnFromFullscreen = useRef(false);
+    const inlineControlsTimeoutHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const fullScreenControlsTimeoutHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const { currentlyPlaying, setCurrentlyPlaying } = useContext(VideoPlayerContext);
+    let isPlaying: boolean = false;
+    if (source) {
+        isPlaying = currentlyPlaying === JSON.stringify(source);
+    }
+    if (src) {
+        isPlaying = currentlyPlaying === src;
+    }
+
+    // ref to hold the updated value of isPlaying to be used in the timeout handler
+    const isPlayingWrapperRef = useRef(isPlaying);
+    isPlayingWrapperRef.current = isPlaying;
+
+    const isLoading = isPlaying && playableDuration - inlineVideoPosition <= 0;
+    const fullscreenIsLoading =
+        isPlaying && fullscreenPlayableDuration - fullscreenVideoPosition <= 0;
+
+    const hideInlineControls = () => {
+        inlineControlsTimeoutHandle.current = null;
+        if (isPlayingWrapperRef.current) {
+            setShowControls(false);
+        }
+    };
+
+    const hideFullScreenControls = () => {
+        fullScreenControlsTimeoutHandle.current = null;
+        if (isPlayingWrapperRef.current) {
+            setShowFullscreenControls(false);
+        }
+    };
+
+    const displayInlineControls = () => {
+        if (inlineControlsTimeoutHandle.current) {
+            clearTimeout(inlineControlsTimeoutHandle.current);
+        }
+        inlineControlsTimeoutHandle.current = setTimeout(hideInlineControls, hideControlsTimeout);
+        setShowControls(true);
+    };
+
+    const displayFullScreenControls = () => {
+        if (fullScreenControlsTimeoutHandle.current) {
+            clearTimeout(fullScreenControlsTimeoutHandle.current);
+        }
+        fullScreenControlsTimeoutHandle.current = setTimeout(
+            hideFullScreenControls,
+            hideControlsTimeout,
+        );
+        setShowFullscreenControls(true);
+    };
 
     if (!src && !source) {
         if (__DEV__) {
@@ -149,24 +201,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         return null;
     }
 
-    let isPlaying: boolean = false;
-    if (source) {
-        isPlaying = currentlyPlaying === JSON.stringify(source);
-    }
-    if (src) {
-        isPlaying = currentlyPlaying === src;
-    }
-
-    const isLoading = isPlaying && playableDuration - inlineVideoPosition <= 0;
-    const fullscreenIsLoading =
-        isPlaying && fullscreenPlayableDuration - fullscreenVideoPosition <= 0;
-
     const exitFullScreen = () => {
         returnFromFullscreen.current = true;
         setFullscreen(false);
         setFullscreenVideoLoaded(false);
         setShowFullscreenControls(false);
         Orientation.lockToPortrait();
+        displayInlineControls();
     };
 
     const videoSource: VideoProperties['source'] = source || { uri: src };
@@ -177,7 +218,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'black' }}>
                     {inlineVideoStarted ? (
                         <TouchableWithoutFeedback
-                            onPress={() => videoLoaded && setShowControls(true)}>
+                            onPress={() => videoLoaded && displayInlineControls()}>
                             {/* inline video*/}
                             <Video
                                 repeat={repeat}
@@ -260,7 +301,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             !iOSNativeControls &&
                             videoLoaded &&
                             showControls)) && (
-                        <TouchableWithoutFeedback onPress={() => setShowControls(false)}>
+                        <TouchableWithoutFeedback onPress={hideInlineControls}>
                             {/* controls container*/}
                             <View
                                 style={[
@@ -283,15 +324,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {showSkipButtons && (
                                         <TouchableOpacity
                                             onPress={() => {
-                                                if (fullscreen) {
-                                                    fullscreenVideoRef.current?.seek(
-                                                        fullscreenVideoPosition - skipInterval,
-                                                    );
-                                                } else {
-                                                    inlineVideoRef.current?.seek(
-                                                        inlineVideoPosition - skipInterval,
-                                                    );
-                                                }
+                                                inlineVideoRef.current?.seek(
+                                                    inlineVideoPosition - skipInterval,
+                                                );
+                                                displayInlineControls();
                                             }}
                                             style={{ padding: 8 }}>
                                             <SeekBackwardIcon width={42} height={42} fill="#fff" />
@@ -301,7 +337,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {/* skip previous button */}
                                     {onPreviousVideo && (
                                         <TouchableOpacity
-                                            onPress={onPreviousVideo}
+                                            onPress={() => {
+                                                onPreviousVideo();
+                                                displayInlineControls();
+                                            }}
                                             style={{ padding: 8 }}>
                                             <SkipPreviousIcon width={42} height={42} fill="#fff" />
                                         </TouchableOpacity>
@@ -322,6 +361,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                         : null,
                                                 );
                                             }
+                                            displayInlineControls();
                                         }}
                                         style={{ padding: 8 }}>
                                         {isPlaying ? (
@@ -334,7 +374,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {/* skip next button */}
                                     {onNextVideo && (
                                         <TouchableOpacity
-                                            onPress={onNextVideo}
+                                            onPress={() => {
+                                                onNextVideo();
+                                                displayInlineControls();
+                                            }}
                                             style={{ padding: 8 }}>
                                             <SkipNextIcon width={42} height={42} fill="#fff" />
                                         </TouchableOpacity>
@@ -344,15 +387,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {showSkipButtons && (
                                         <TouchableOpacity
                                             onPress={() => {
-                                                if (fullscreen) {
-                                                    fullscreenVideoRef.current?.seek(
-                                                        fullscreenVideoPosition + skipInterval,
-                                                    );
-                                                } else {
-                                                    inlineVideoRef.current?.seek(
-                                                        inlineVideoPosition + skipInterval,
-                                                    );
-                                                }
+                                                inlineVideoRef.current?.seek(
+                                                    inlineVideoPosition + skipInterval,
+                                                );
+                                                displayInlineControls();
                                             }}
                                             style={{ padding: 8 }}>
                                             <SeekForwardIcon width={42} height={42} fill="#fff" />
@@ -383,6 +421,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 style={[styles.iconButton]}
                                                 onPress={() => {
                                                     setMuted(false);
+                                                    displayInlineControls();
                                                 }}>
                                                 <SoundMutedIcon {...iconProps} />
                                             </TouchableOpacity>
@@ -391,6 +430,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 style={[styles.iconButton]}
                                                 onPress={() => {
                                                     setMuted(true);
+                                                    displayInlineControls();
                                                 }}>
                                                 <SoundOnIcon {...iconProps} />
                                             </TouchableOpacity>
@@ -407,6 +447,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 } else {
                                                     setFullscreen(true);
                                                     Orientation.lockToLandscape();
+                                                    displayFullScreenControls();
                                                 }
                                             }}
                                             style={styles.iconButton}>
@@ -461,6 +502,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </View>
             )}
 
+            {/* fullscreen modal */}
             {Platform.OS === 'android' && (
                 <Modal
                     presentationStyle="fullScreen"
@@ -469,7 +511,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                     onRequestClose={exitFullScreen}>
                     <StatusBar hidden={fullscreen} />
                     <TouchableWithoutFeedback
-                        onPress={() => fullScreenVideoLoaded && setShowFullscreenControls(true)}>
+                        onPress={() => fullScreenVideoLoaded && displayFullScreenControls()}>
                         {/* fullscreen video - android only */}
                         <Video
                             repeat={repeat}
@@ -524,7 +566,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         </View>
                     )}
                     {fullScreenVideoLoaded && showFullscreenControls && (
-                        <TouchableWithoutFeedback onPress={() => setShowFullscreenControls(false)}>
+                        <TouchableWithoutFeedback onPress={hideFullScreenControls}>
                             {/* controls container*/}
                             <View
                                 style={[
@@ -547,15 +589,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {showSkipButtons && (
                                         <TouchableOpacity
                                             onPress={() => {
-                                                if (fullscreen) {
-                                                    fullscreenVideoRef.current?.seek(
-                                                        fullscreenVideoPosition - skipInterval,
-                                                    );
-                                                } else {
-                                                    inlineVideoRef.current?.seek(
-                                                        inlineVideoPosition - skipInterval,
-                                                    );
-                                                }
+                                                fullscreenVideoRef.current?.seek(
+                                                    fullscreenVideoPosition - skipInterval,
+                                                );
+                                                displayFullScreenControls();
                                             }}
                                             style={{ padding: 8 }}>
                                             <SeekBackwardIcon width={42} height={42} fill="#fff" />
@@ -565,7 +602,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {/* skip previous button */}
                                     {onPreviousVideo && (
                                         <TouchableOpacity
-                                            onPress={onPreviousVideo}
+                                            onPress={() => {
+                                                onPreviousVideo();
+                                                displayFullScreenControls();
+                                            }}
                                             style={{ padding: 8 }}>
                                             <SkipPreviousIcon width={42} height={42} fill="#fff" />
                                         </TouchableOpacity>
@@ -586,6 +626,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                         : null,
                                                 );
                                             }
+                                            displayFullScreenControls();
                                         }}
                                         style={{ padding: 8 }}>
                                         {isPlaying ? (
@@ -598,7 +639,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {/* skip next button */}
                                     {onNextVideo && (
                                         <TouchableOpacity
-                                            onPress={onNextVideo}
+                                            onPress={() => {
+                                                onNextVideo();
+                                                displayFullScreenControls();
+                                            }}
                                             style={{ padding: 8 }}>
                                             <SkipNextIcon width={42} height={42} fill="#fff" />
                                         </TouchableOpacity>
@@ -608,15 +652,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     {showSkipButtons && (
                                         <TouchableOpacity
                                             onPress={() => {
-                                                if (fullscreen) {
-                                                    fullscreenVideoRef.current?.seek(
-                                                        fullscreenVideoPosition + skipInterval,
-                                                    );
-                                                } else {
-                                                    inlineVideoRef.current?.seek(
-                                                        inlineVideoPosition + skipInterval,
-                                                    );
-                                                }
+                                                fullscreenVideoRef.current?.seek(
+                                                    fullscreenVideoPosition + skipInterval,
+                                                );
+                                                displayFullScreenControls();
                                             }}
                                             style={{ padding: 8 }}>
                                             <SeekForwardIcon width={42} height={42} fill="#fff" />
@@ -648,6 +687,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 style={[styles.iconButton]}
                                                 onPress={() => {
                                                     setMuted(false);
+                                                    displayFullScreenControls();
                                                 }}>
                                                 <SoundMutedIcon {...iconProps} />
                                             </TouchableOpacity>
@@ -656,6 +696,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                 style={[styles.iconButton]}
                                                 onPress={() => {
                                                     setMuted(true);
+                                                    displayFullScreenControls();
                                                 }}>
                                                 <SoundOnIcon {...iconProps} />
                                             </TouchableOpacity>
