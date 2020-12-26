@@ -101,7 +101,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     repeat = false,
     onPreviousVideo,
     onNextVideo,
-    iOSNativeControls = true,
+    iOSNativeControls = false,
     poster,
     onProgress,
     onLoad,
@@ -251,10 +251,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 }}
                                 controls={iOSNativeControls && Platform.OS === 'ios'}
                                 onEnd={(...params) => {
-                                    setCurrentlyPlaying(null);
                                     setShowControls(true);
-                                    fullscreenVideoRef.current?.seek(0);
-                                    inlineVideoRef.current?.seek(0);
+                                    if (!repeat) {
+                                        setCurrentlyPlaying(null);
+                                        fullscreenVideoRef.current?.seek(0);
+                                        inlineVideoRef.current?.seek(0);
+                                    }
                                     onEnd && onEnd(...params);
                                 }}
                             />
@@ -301,7 +303,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             !iOSNativeControls &&
                             videoLoaded &&
                             showControls)) && (
-                        <TouchableWithoutFeedback onPress={hideInlineControls}>
+                        <TouchableWithoutFeedback
+                            onPress={() => {
+                                if (inlineControlsTimeoutHandle.current) {
+                                    clearTimeout(inlineControlsTimeoutHandle.current);
+                                    inlineControlsTimeoutHandle.current = null;
+                                }
+                                setShowControls(false);
+                            }}>
                             {/* controls container*/}
                             <View
                                 style={[
@@ -517,7 +526,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             repeat={repeat}
                             paused={!isPlaying}
                             fullscreenAutorotate={true}
-                            fullscreenOrientation="landscape"
                             posterResizeMode="cover"
                             style={[StyleSheet.absoluteFillObject, { backgroundColor: 'black' }]}
                             {...rest}
@@ -566,7 +574,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                         </View>
                     )}
                     {fullScreenVideoLoaded && showFullscreenControls && (
-                        <TouchableWithoutFeedback onPress={hideFullScreenControls}>
+                        <TouchableWithoutFeedback
+                            onPress={() => {
+                                if (fullScreenControlsTimeoutHandle.current) {
+                                    clearTimeout(fullScreenControlsTimeoutHandle.current);
+                                    fullScreenControlsTimeoutHandle.current = null;
+                                }
+                                setShowFullscreenControls(false);
+                            }}>
                             {/* controls container*/}
                             <View
                                 style={[

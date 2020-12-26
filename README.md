@@ -49,7 +49,7 @@ The `VideoPlayer` components accepts all of the props passed to the [Video](http
 |src|String Required|default value|video url as a string. this is a shortcut convinent prop for simple cases of having one video url. you can still use the `source` prop from react-native-video as documented their. but either one of `src` or `source` prop from react-native-video must be used. `source` will override `src` if both are provided. if none of them are provided or `src` is provided with a value other than a primitive string, the VideoPlayer component will render nothing and throws an error in development |
 |onNextVideo|Function Optional|undefined|call back function which is triggered on pressing the next button|
 |onPreviousVideo|Function Optional|undefined|call back function which is triggered on pressing the previous button|
-|iOSNativeControls|boolean|true|whether to use iOS native controls or VideoPlayer custom controls|
+|iOSNativeControls|boolean|false|whether to use iOS native controls or VideoPlayer custom controls. setting this prop with true makes the video player component uncontrolled|
 |showSkipButtons|boolean optional|true|whether to display the skip buttons or not|
 |skipInterval|number optional|10|number of seconds to seek forward or backwards upon pressing the skip buttons|
 |hideControlsTimeout|number optional|4000|time in ms before hiding the controls. Controls will not hide if the video is paused.|
