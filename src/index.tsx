@@ -101,7 +101,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     repeat = false,
     onPreviousVideo,
     onNextVideo,
-    iOSNativeControls = true,
+    iOSNativeControls = false,
     poster,
     onProgress,
     onLoad,
@@ -526,7 +526,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                             repeat={repeat}
                             paused={!isPlaying}
                             fullscreenAutorotate={true}
-                            fullscreenOrientation="landscape"
                             posterResizeMode="cover"
                             style={[StyleSheet.absoluteFillObject, { backgroundColor: 'black' }]}
                             {...rest}
