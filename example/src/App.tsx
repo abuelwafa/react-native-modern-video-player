@@ -1,15 +1,20 @@
 import * as React from 'react';
-import { Text, SafeAreaView, ScrollView, useWindowDimensions, View } from 'react-native';
+import { Text, SafeAreaView, ScrollView, View, StyleSheet, Dimensions } from 'react-native';
 import { VideoPlayer, VideoPlayerProvider } from 'react-native-modern-video-player';
 
+const { width } = Dimensions.get('window');
+
+const styles = StyleSheet.create({
+    videoWrapper: { marginVertical: 12, width, height: (width * 9) / 16 },
+});
+
 export default function App() {
-    const { width } = useWindowDimensions();
     return (
         <SafeAreaView>
             <ScrollView>
                 <VideoPlayerProvider>
                     <Text>Remote video</Text>
-                    <View style={{ marginVertical: 12, width, height: (width * 9) / 16 }}>
+                    <View style={styles.videoWrapper}>
                         <VideoPlayer
                             source={{
                                 uri:
@@ -20,7 +25,7 @@ export default function App() {
                     </View>
 
                     <Text>Remote video</Text>
-                    <View style={{ marginVertical: 12, width, height: (width * 9) / 16 }}>
+                    <View style={styles.videoWrapper}>
                         <VideoPlayer
                             src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                             poster="https://loremflickr.com/440/360?v=2"
@@ -28,7 +33,7 @@ export default function App() {
                     </View>
 
                     <Text>Remote video</Text>
-                    <View style={{ marginVertical: 12, width, height: (width * 9) / 16 }}>
+                    <View style={styles.videoWrapper}>
                         <VideoPlayer
                             src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
                             poster="https://loremflickr.com/440/360?v=3"
@@ -36,7 +41,7 @@ export default function App() {
                     </View>
 
                     <Text>Remote video</Text>
-                    <View style={{ marginVertical: 12, width, height: (width * 9) / 16 }}>
+                    <View style={styles.videoWrapper}>
                         <VideoPlayer
                             src="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
                             poster="https://loremflickr.com/440/360?v=4"
@@ -44,7 +49,7 @@ export default function App() {
                     </View>
 
                     <Text>Local video</Text>
-                    <View style={{ marginVertical: 12, width, height: (width * 9) / 16 }}>
+                    <View style={styles.videoWrapper}>
                         <VideoPlayer
                             source={require('./test-video-1.mp4')}
                             poster="https://loremflickr.com/440/360?v=5"
@@ -52,7 +57,7 @@ export default function App() {
                     </View>
 
                     <Text>Local video</Text>
-                    <View style={{ marginVertical: 12, width, height: (width * 9) / 16 }}>
+                    <View style={styles.videoWrapper}>
                         <VideoPlayer
                             source={require('./test-video-2.mp4')}
                             poster="https://loremflickr.com/440/360?v=6"
