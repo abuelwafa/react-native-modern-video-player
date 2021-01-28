@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles, no-shadow */
-import React, { useRef, useState, useContext } from 'react';
+import React, { useRef, useState, useContext, useEffect, useCallback } from 'react';
 import {
     View,
     StyleSheet,
@@ -62,8 +62,26 @@ const VideoPlayerContext = React.createContext<{
     setCurrentlyPlaying: () => {},
 });
 
-const VideoPlayerProvider: React.FC = ({ children }) => {
-    const [currentlyPlaying, setCurrentlyPlaying] = useState<string | null>(null);
+const VideoPlayerProvider: React.FC<{ shouldPlay?: (src: string | null) => boolean }> = ({
+    children,
+    shouldPlay = () => true,
+}) => {
+    const [currentlyPlaying, setCurrentlyPlayingState] = useState<string | null>(null);
+
+    const setCurrentlyPlaying = useCallback(
+        (src: string | null) => {
+            if (src && shouldPlay(src)) {
+                setCurrentlyPlayingState(src);
+            } else {
+                setCurrentlyPlayingState(null);
+            }
+        },
+        [shouldPlay],
+    );
+
+    useEffect(() => {
+        setCurrentlyPlaying(currentlyPlaying);
+    }, [shouldPlay, currentlyPlaying, setCurrentlyPlaying]);
 
     return (
         <VideoPlayerContext.Provider value={{ currentlyPlaying, setCurrentlyPlaying }}>

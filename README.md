@@ -40,6 +40,12 @@ You can wrap one or more `VideoPlayer` components inside a `VideoPlayerProvider`
 
 ## API
 
+### `VideoPlayerProvider` props
+
+| prop | type | default value | description |
+| ---- | ---- | ------------- | ----------- |
+| shouldPlay | Function | (src: string) => true | determines whether the video about to be played should be played or not. this function is called prior to chaning the played video src or its reference is changed. this gives the control to the parent component to control the state of which video to be played. check the guides below for some usecases.|
+
 ### `VideoPlayer` props
 
 The `VideoPlayer` components accepts all of the props passed to the [Video](https://github.com/react-native-video/react-native-video#configurable-props) component from react-native-video, in addition to the following props:
@@ -53,6 +59,58 @@ The `VideoPlayer` components accepts all of the props passed to the [Video](http
 |showSkipButtons|boolean optional|true|whether to display the skip buttons or not|
 |skipInterval|number optional|10|number of seconds to seek forward or backwards upon pressing the skip buttons|
 |hideControlsTimeout|number optional|4000|time in ms before hiding the controls. Controls will not hide if the video is paused.|
+
+## Guides
+
+### Stop playing when the VideoPlayer gets out of view when inside a FlatList
+We get the currently viewable items from the flatlist, and control video playback using the `shouldPlay` prop on the `VideoPlayerProvider` component.
+```
+const { width } = Dimensions.get('window');
+
+// some long list of videos
+const videos = [
+    { src: 'VIDEO_URL', poster: 'POSTER_IMAGE' },
+    // ...etc
+];
+
+const styles = StyleSheet.create({
+    videoWrapper: { height: (width * 9) / 16 },
+    separator: { height: 12 },
+});
+
+const App = () => {
+    const [viewableItems, setViewableItems] = useState<string[]>([]);
+
+    const handleViewableItemsChange = useMemo(
+        () => ({ viewableItems: newViewableItems }) => {
+            setViewableItems(newViewableItems.map((i: ViewToken) => i.key));
+        },
+        [],
+    );
+
+    const shouldPlayVideo = useCallback(
+        (src: string | null) => {
+            return !!src && viewableItems.includes(src);
+        },
+        [viewableItems],
+    );
+
+    return (
+        <VideoPlayerProvider shouldPlay={shouldPlayVideo}>
+            <FlatList
+                data={videos}
+                keyExtractor={(item) => item.src}
+                renderItem={({ item }) => (
+                    <View style={styles.videoWrapper}>
+                        <VideoPlayer src={item.src} poster={item.poster} />
+                    </View>
+                )}
+                onViewableItemsChanged={handleViewableItemsChange}
+            />
+        </VideoPlayerProvider>
+    );
+};
+```
 
 ## TODO
 
