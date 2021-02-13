@@ -68,9 +68,7 @@ const VideoPlayerProvider: React.FC<{
     shouldPlay?: (src: string | null) => boolean;
     autoplay?: string | null;
 }> = ({ children, shouldPlay = () => true, autoplay = null }) => {
-    const [currentlyPlaying, setCurrentlyPlayingState] = useState<string | null>(
-        autoplay ? JSON.stringify(autoplay) : null,
-    );
+    const [currentlyPlaying, setCurrentlyPlayingState] = useState<string | null>(autoplay || null);
 
     const setCurrentlyPlaying = useCallback(
         (src: string | null) => {
@@ -89,9 +87,7 @@ const VideoPlayerProvider: React.FC<{
 
     useEffect(() => {
         if (autoplay) {
-            setCurrentlyPlayingState(JSON.stringify(autoplay));
-        } else {
-            setCurrentlyPlayingState(null);
+            setCurrentlyPlayingState(autoplay);
         }
     }, [autoplay]);
 
@@ -173,7 +169,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         isPlaying = currentlyPlaying === JSON.stringify(source);
     }
     if (src) {
-        isPlaying = !!currentlyPlaying && currentlyPlaying === JSON.stringify(src);
+        isPlaying = !!currentlyPlaying && currentlyPlaying === src;
     }
 
     useEffect(() => {
@@ -312,11 +308,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                     // extract this to a function called play
                                     setInlineVideoStarted(true);
                                     setCurrentlyPlaying(
-                                        source
-                                            ? JSON.stringify(source)
-                                            : src
-                                            ? JSON.stringify(src)
-                                            : null,
+                                        source ? JSON.stringify(source) : src ? src : null,
                                     );
                                 }}
                                 style={{
@@ -409,7 +401,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                     source
                                                         ? JSON.stringify(source)
                                                         : src
-                                                        ? JSON.stringify(src)
+                                                        ? src
                                                         : null,
                                                 );
                                             }
@@ -680,7 +672,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                                     source
                                                         ? JSON.stringify(source)
                                                         : src
-                                                        ? JSON.stringify(src)
+                                                        ? src
                                                         : null,
                                                 );
                                             }
