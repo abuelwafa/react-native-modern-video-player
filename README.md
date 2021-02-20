@@ -45,6 +45,7 @@ You can wrap one or more `VideoPlayer` components inside a `VideoPlayerProvider`
 | prop | type | default value | description |
 | ---- | ---- | ------------- | ----------- |
 | shouldPlay | Function | (src: string) => true | determines whether the video about to be played should be played or not. this function is called prior to chaning the played video src or its reference is changed. this gives the control to the parent component to control the state of which video to be played. check the guides below for some usecases.|
+| autoplay | String or Null | null | value for the `src` or `source` prop values for the video to start playback automatically automatically when the component is mounted.|
 
 ### `VideoPlayer` props
 
@@ -64,7 +65,7 @@ The `VideoPlayer` components accepts all of the props passed to the [Video](http
 
 ### Stop playing when the VideoPlayer gets out of view when inside a FlatList
 We get the currently viewable items from the flatlist, and control video playback using the `shouldPlay` prop on the `VideoPlayerProvider` component.
-```
+```js
 const { width } = Dimensions.get('window');
 
 // some long list of videos
@@ -112,14 +113,33 @@ const App = () => {
 };
 ```
 
+### Usage with [React Navigation](https://reactnavigation.org/)
+
+When using React Navigation, Navigating away from a screen with a playing `VideoPlayer` component, the playback won't stop automatically because the compnent is still rendered in the background and not unmounted.
+Since the `VideoPlayerProvider` component will call the provided `shouldPlay` function when its reference change, we can fix this problem by leveraging the [`useIsFocused`](https://reactnavigation.org/docs/use-is-focused) hook from React Navigation, and check whether the screen is currently focused or not to play/stop video playback.
+```
+    ...
+    const isFocused = useIsFocused();
+    const shouldPlayVideo = useCallback(() => isFocused, [isFocused]);
+    ...
+```
+
+If the `VideoPlayer` is in a list as in the previous example, we can combine both checks in the shouldPlayVideo function from the previous example as follows:
+```
+    const shouldPlayVideo = useCallback(
+        (src: string | null) => {
+            return isFocused && !!src && viewableItems.includes(src);
+        },
+        [viewableItems, isFocused],
+    );
+```
+
 ## TODO
 
-- Seek functionality
-- Complete documentation.
-- Write tests.
+- Seek bar functionality
+- Simplify code and Write tests.
 - Subtitles support.
-- Playback rate.
-- Callback hooks
+- Playback rate UI.
 - Theming - customizing styling
 
 ## Contributing
