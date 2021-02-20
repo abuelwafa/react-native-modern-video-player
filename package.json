@@ -1,6 +1,6 @@
 {
   "name": "react-native-modern-video-player",
-  "version": "0.2.2",
+  "version": "0.3.1-0",
   "description": "simple video player for react native based on react-native-video",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",

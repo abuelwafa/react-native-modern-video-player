@@ -57,16 +57,18 @@ const formatSecondsTime = (duration: number): string => {
 const VideoPlayerContext = React.createContext<{
     currentlyPlaying: string | null;
     setCurrentlyPlaying: (src: string | null) => void;
+    autoplay: VideoProperties['source'] | string | null;
 }>({
     currentlyPlaying: null,
     setCurrentlyPlaying: () => {},
+    autoplay: null,
 });
 
-const VideoPlayerProvider: React.FC<{ shouldPlay?: (src: string | null) => boolean }> = ({
-    children,
-    shouldPlay = () => true,
-}) => {
-    const [currentlyPlaying, setCurrentlyPlayingState] = useState<string | null>(null);
+const VideoPlayerProvider: React.FC<{
+    shouldPlay?: (src: string | null) => boolean;
+    autoplay?: string | null;
+}> = ({ children, shouldPlay = () => true, autoplay = null }) => {
+    const [currentlyPlaying, setCurrentlyPlayingState] = useState<string | null>(autoplay || null);
 
     const setCurrentlyPlaying = useCallback(
         (src: string | null) => {
@@ -83,8 +85,14 @@ const VideoPlayerProvider: React.FC<{ shouldPlay?: (src: string | null) => boole
         setCurrentlyPlaying(currentlyPlaying);
     }, [shouldPlay, currentlyPlaying, setCurrentlyPlaying]);
 
+    useEffect(() => {
+        if (autoplay) {
+            setCurrentlyPlayingState(autoplay);
+        }
+    }, [autoplay]);
+
     return (
-        <VideoPlayerContext.Provider value={{ currentlyPlaying, setCurrentlyPlaying }}>
+        <VideoPlayerContext.Provider value={{ currentlyPlaying, setCurrentlyPlaying, autoplay }}>
             {children}
         </VideoPlayerContext.Provider>
     );
@@ -129,7 +137,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
     const inlineVideoRef = useRef<Video>(null);
     const fullscreenVideoRef = useRef<Video>(null);
-    const { currentlyPlaying, setCurrentlyPlaying } = useContext(VideoPlayerContext);
+    const { currentlyPlaying, setCurrentlyPlaying, autoplay } = useContext(VideoPlayerContext);
 
     const [fullscreen, setFullscreen] = useState(false);
 
@@ -149,7 +157,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const [videoLoaded, setVideoLoaded] = useState(false);
     const [fullScreenVideoLoaded, setFullscreenVideoLoaded] = useState(false);
 
-    const [inlineVideoStarted, setInlineVideoStarted] = useState(false);
+    const [inlineVideoStarted, setInlineVideoStarted] = useState(
+        source ? autoplay === source : autoplay === src,
+    );
     const returnFromFullscreen = useRef(false);
     const inlineControlsTimeoutHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
     const fullScreenControlsTimeoutHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -159,8 +169,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         isPlaying = currentlyPlaying === JSON.stringify(source);
     }
     if (src) {
-        isPlaying = currentlyPlaying === src;
+        isPlaying = !!currentlyPlaying && currentlyPlaying === src;
     }
+
+    useEffect(() => {
+        if (autoplay) {
+            if ((source && autoplay === JSON.stringify(source)) || autoplay === src) {
+                setInlineVideoStarted(true);
+            }
+        }
+    }, [autoplay, src, source]);
 
     // ref to hold the updated value of isPlaying to be used in the timeout handler
     const isPlayingWrapperRef = useRef(isPlaying);
