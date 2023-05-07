@@ -16,17 +16,6 @@ export default function App() {
                     <Text>Remote video</Text>
                     <View style={styles.videoWrapper}>
                         <VideoPlayer
-                            source={{
-                                uri:
-                                    'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-                            }}
-                            poster="https://loremflickr.com/440/360?v=1"
-                        />
-                    </View>
-
-                    <Text>Remote video</Text>
-                    <View style={styles.videoWrapper}>
-                        <VideoPlayer
                             src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
                             poster="https://loremflickr.com/440/360?v=2"
                         />
@@ -45,22 +34,6 @@ export default function App() {
                         <VideoPlayer
                             src="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4"
                             poster="https://loremflickr.com/440/360?v=4"
-                        />
-                    </View>
-
-                    <Text>Local video</Text>
-                    <View style={styles.videoWrapper}>
-                        <VideoPlayer
-                            source={require('./test-video-1.mp4')}
-                            poster="https://loremflickr.com/440/360?v=5"
-                        />
-                    </View>
-
-                    <Text>Local video</Text>
-                    <View style={styles.videoWrapper}>
-                        <VideoPlayer
-                            source={require('./test-video-2.mp4')}
-                            poster="https://loremflickr.com/440/360?v=6"
                         />
                     </View>
                 </VideoPlayerProvider>

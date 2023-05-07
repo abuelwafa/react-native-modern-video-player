@@ -1,6 +1,6 @@
 # react-native-modern-video-player
 
-Currently a Simple video player for react native based on react-native-video. Aiming to become a full featured video player with a clean and customizable UI, on top of a simple and extensible API.
+Currently a Simple video player for react native based on react-native-video. Aiming to become a full featured video player with a clean and customizable UI, on top of a simple and extensible declarative API.
 
 ## Installation
 
@@ -117,7 +117,7 @@ const App = () => {
 
 When using React Navigation, Navigating away from a screen with a playing `VideoPlayer` component, the playback won't stop automatically because the compnent is still rendered in the background and not unmounted.
 Since the `VideoPlayerProvider` component will call the provided `shouldPlay` function when its reference change, we can fix this problem by leveraging the [`useIsFocused`](https://reactnavigation.org/docs/use-is-focused) hook from React Navigation, and check whether the screen is currently focused or not to play/stop video playback.
-```
+```js
     ...
     const isFocused = useIsFocused();
     const shouldPlayVideo = useCallback(() => isFocused, [isFocused]);
@@ -125,7 +125,7 @@ Since the `VideoPlayerProvider` component will call the provided `shouldPlay` fu
 ```
 
 If the `VideoPlayer` is in a list as in the previous example, we can combine both checks in the shouldPlayVideo function from the previous example as follows:
-```
+```js
     const shouldPlayVideo = useCallback(
         (src: string | null) => {
             return isFocused && !!src && viewableItems.includes(src);

@@ -11,6 +11,9 @@ import {
     TouchableWithoutFeedback,
     ActivityIndicator,
     Modal,
+    Animated,
+    PanResponder,
+    Dimensions,
 } from 'react-native';
 import Video from 'react-native-video';
 import type { VideoProperties } from 'react-native-video';
@@ -47,6 +50,8 @@ const styles = StyleSheet.create({
     },
     iconButton: { padding: 6 },
 });
+
+const { width: windowWidth } = Dimensions.get('window');
 
 const formatSecondsTime = (duration: number): string => {
     const minutes = Math.floor(duration / 60);
@@ -133,6 +138,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     onLoad,
     onEnd,
     hideControlsTimeout = 4000,
+    onSeek,
     ...rest
 }) => {
     const inlineVideoRef = useRef<Video>(null);
@@ -163,6 +169,32 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const returnFromFullscreen = useRef(false);
     const inlineControlsTimeoutHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
     const fullScreenControlsTimeoutHandle = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const pan = useRef(new Animated.Value(0)).current;
+    const playbackProgressPercent = useRef(new Animated.Value(0)).current;
+    const isPanning = useRef(new Animated.Value(0)).current; // 0 or 1
+    const seekBarWidth = useRef(new Animated.Value(windowWidth)).current;
+
+    const durationAnimatedValue = useRef(new Animated.Value(0)).current;
+    const inlineVideoPositionAnimated = useRef(new Animated.Value(0)).current;
+
+    const panResponder = useRef(
+        PanResponder.create({
+            onMoveShouldSetPanResponder: () => true,
+            onPanResponderGrant: () => {
+                pan.flattenOffset();
+                isPanning.setValue(1);
+            },
+            onPanResponderMove: Animated.event([null, { dx: pan }], { useNativeDriver: false }),
+            onPanResponderRelease: (_, gestureState) => {
+                inlineVideoRef.current?.seek(
+                    inlineVideoPositionAnimated._value +
+                        (gestureState.dx * durationAnimatedValue._value) / seekBarWidth._value,
+                );
+                isPanning.setValue(0);
+            },
+        }),
+    ).current;
 
     let isPlaying: boolean = false;
     if (source) {
@@ -268,15 +300,32 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 muted={muted}
                                 resizeMode="contain"
                                 ref={inlineVideoRef}
+                                onSeek={(...params) => {
+                                    const { currentTime } = params[0];
+
+                                    pan.flattenOffset();
+                                    pan.setValue(0);
+
+                                    playbackProgressPercent.setValue(
+                                        (currentTime * 100) / duration,
+                                    );
+
+                                    onSeek && onSeek(...params);
+                                }}
                                 onProgress={(...params) => {
                                     const { currentTime, playableDuration } = params[0];
                                     setInlineVideoPosition(currentTime);
+                                    inlineVideoPositionAnimated.setValue(currentTime);
+                                    playbackProgressPercent.setValue(
+                                        (currentTime * 100) / duration,
+                                    );
                                     setPlayableDuration(playableDuration);
                                     onProgress && onProgress(...params);
                                 }}
                                 onLoad={(...params) => {
                                     const { duration } = params[0];
                                     setDuration(duration);
+                                    durationAnimatedValue.setValue(duration);
                                     setVideoLoaded(true);
                                     if (inlineVideoRef.current && returnFromFullscreen.current) {
                                         inlineVideoRef.current.seek(fullscreenVideoPosition);
@@ -499,49 +548,74 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                         </TouchableOpacity>
                                     </View>
                                 </View>
-
-                                {/* seekbar */}
-                                <View
-                                    style={{
-                                        backgroundColor: 'rgba(150, 150, 150, 0.4)',
-                                        height: 3,
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                    }}>
-                                    <View
-                                        style={[
-                                            StyleSheet.absoluteFillObject,
-                                            {
-                                                backgroundColor: 'rgb(150, 150, 150)',
-                                                width: `${(playableDuration * 100) / duration}%`,
-                                            },
-                                        ]}
-                                    />
-                                    <View
-                                        style={[
-                                            StyleSheet.absoluteFillObject,
-                                            {
-                                                backgroundColor: 'red',
-                                                width: `${(inlineVideoPosition * 100) / duration}%`,
-                                            },
-                                        ]}
-                                    />
-                                    <View
-                                        style={{
-                                            width: 12,
-                                            height: 12,
-                                            backgroundColor: 'red',
-                                            borderRadius: 50,
-                                            position: 'absolute',
-                                            top: -5,
-                                            left: `${(inlineVideoPosition * 100) / duration}%`,
-                                        }}
-                                    />
-                                </View>
                             </View>
                         </TouchableWithoutFeedback>
+                    )}
+
+                    {/* seekbar */}
+                    <View
+                        style={{
+                            backgroundColor: 'rgba(150, 150, 150, 0.4)',
+                            height: 3,
+                            position: 'absolute',
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                        }}>
+                        <View
+                            style={[
+                                StyleSheet.absoluteFillObject,
+                                {
+                                    backgroundColor: 'rgb(150, 150, 150)',
+                                    width: `${(playableDuration * 100) / duration}%`,
+                                },
+                            ]}
+                        />
+                        <View
+                            style={[
+                                StyleSheet.absoluteFillObject,
+                                {
+                                    backgroundColor: 'red',
+                                    width: `${(inlineVideoPosition * 100) / duration}%`,
+                                },
+                            ]}
+                        />
+                    </View>
+                    {true && (
+                        <Animated.View
+                            style={{
+                                width: isPanning.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [12, 18],
+                                }),
+                                height: isPanning.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [12, 18],
+                                }),
+                                backgroundColor: 'red',
+                                borderRadius: 50,
+                                position: 'absolute',
+                                // top: -5,
+                                bottom: -5,
+                                transform: [
+                                    {
+                                        translateX: Animated.add(
+                                            Animated.divide(
+                                                Animated.multiply(
+                                                    playbackProgressPercent,
+                                                    seekBarWidth,
+                                                ),
+                                                100,
+                                            ),
+                                            pan,
+                                        ),
+                                    },
+                                ],
+                                // left: `${(inlineVideoPosition * 100) / duration}%`,
+                            }}
+                            hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+                            {...panResponder.panHandlers}
+                        />
                     )}
                 </View>
             )}
@@ -590,6 +664,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 setShowControls(true);
                                 setFullscreenVideoPosition(0);
                                 setInlineVideoPosition(0);
+                                inlineVideoPositionAnimated.setValue(0);
                                 fullscreenVideoRef.current?.seek(0);
                                 inlineVideoRef.current?.seek(0);
                                 exitFullScreen();
@@ -762,7 +837,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                 </View>
 
                                 {/* seekbar */}
-                                <View
+                                <Animated.View
+                                    onLayout={Animated.event(
+                                        [{ nativeEvent: { layout: { height: seekBarWidth } } }],
+                                        { useNativeDriver: false },
+                                    )}
                                     style={{
                                         backgroundColor: 'rgba(150, 150, 150, 0.4)',
                                         height: 3,
@@ -804,7 +883,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                                             left: `${(fullscreenVideoPosition * 100) / duration}%`,
                                         }}
                                     />
-                                </View>
+                                </Animated.View>
                             </View>
                         </TouchableWithoutFeedback>
                     )}
